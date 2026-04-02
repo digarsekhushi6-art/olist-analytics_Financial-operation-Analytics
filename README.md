@@ -4,6 +4,8 @@ End-to-end analytics project covering **revenue forecasting**, **churn analysis*
 
 **Stack:** Python · pandas · Prophet · XGBoost · SQLite · Streamlit · Plotly
 
+Live Demo: https://olist-analyticsfinancial-operation-analytics-xahw4xrznx3ub7mcq.streamlit.app
+
 ---
 
 ## Project structure
