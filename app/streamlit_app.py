@@ -1,19 +1,27 @@
-import subprocess, sys
-from pathlib import Path
-def _ensure_pipeline():
-    root = Path(__file__).parent.parent
-    db = root / "data" / "olist.db"
-    fc = root / "data" / "processed" / "forecast.csv"
-    if db.exists() and fc.exists(): return
-    scripts = [root/"src"/"generate_data.py", root/"src"/"etl.py", root/"src"/"models"/"forecast.py", root/"src"/"models"/"churn.py", root/"src"/"models"/"profitability.py"]
-    [subprocess.run([sys.executable, str(s)], check=True) for s in scripts]
-_ensure_pipeline()
 """
 app/streamlit_app.py  —  Olist Financial Operations Analytics Dashboard
-Deploy:  streamlit run app/streamlit_app.py
-         OR push to Streamlit Cloud (see README)
 """
-import streamlit as st
+import subprocess, sys
+from pathlib import Path
+
+def _ensure_pipeline():
+    root = Path(__file__).parent.parent
+    db   = root / "data" / "olist.db"
+    fc   = root / "data" / "processed" / "forecast.csv"
+    if db.exists() and fc.exists():
+        return
+    scripts = [
+        root / "src" / "generate_data.py",
+        root / "src" / "etl.py",
+        root / "src" / "models" / "forecast.py",
+        root / "src" / "models" / "churn.py",
+        root / "src" / "models" / "profitability.py",
+    ]
+    for s in scripts:
+        subprocess.run([sys.executable, str(s)], check=True)
+
+_ensure_pipeline()
+
 import pandas as pd
 import numpy as np
 import sqlite3, os
@@ -215,7 +223,8 @@ elif page == "📈 Revenue Forecasting":
         st.error("Run `python src/models/forecast.py` first."); st.stop()
 
     forecast["ds"] = pd.to_datetime(forecast["ds"])
-    mape_val = forecast["mape"].dropna().iloc[0] if "mape" in forecast.columns else None
+    mape_list = forecast["mape"].dropna().tolist() if "mape" in forecast.columns else []
+    mape_val = mape_list[0] if mape_list else None
 
     # KPIs
     actual_rows = forecast[forecast["is_forecast"]==0]
@@ -486,4 +495,3 @@ elif page == "📋 Cohort Retention":
     st.divider()
     st.markdown("### Raw cohort table")
     st.dataframe(cohort, use_container_width=True, hide_index=True)
-
