@@ -1,3 +1,13 @@
+import subprocess, sys
+from pathlib import Path
+def _ensure_pipeline():
+    root = Path(__file__).parent.parent
+    db = root / "data" / "olist.db"
+    fc = root / "data" / "processed" / "forecast.csv"
+    if db.exists() and fc.exists(): return
+    scripts = [root/"src"/"generate_data.py", root/"src"/"etl.py", root/"src"/"models"/"forecast.py", root/"src"/"models"/"churn.py", root/"src"/"models"/"profitability.py"]
+    [subprocess.run([sys.executable, str(s)], check=True) for s in scripts]
+_ensure_pipeline()
 """
 app/streamlit_app.py  —  Olist Financial Operations Analytics Dashboard
 Deploy:  streamlit run app/streamlit_app.py
@@ -476,3 +486,4 @@ elif page == "📋 Cohort Retention":
     st.divider()
     st.markdown("### Raw cohort table")
     st.dataframe(cohort, use_container_width=True, hide_index=True)
+
